@@ -1,9 +1,10 @@
-import express from "express";
-import { createPaper, getPapers } from "../controllers/paperController";
+const express = require("express");
+const createPaper = require("../models/Paper")
+const getPapers = require("../models/Paper")
 
 const router = express.Router();
 
 router.post("/", createPaper);
 router.get("/", getPapers)
 
-export default router;
+module.exports =  router;
