@@ -1,8 +1,8 @@
-import express from "express";
-import morgan from "morgan";
-import dotenv from "dotenv";
-import cors from "cors";
-import paperRoutes from "./routes/paperRoutes.js";
+const express = require("express");
+const morgan = require("morgan");
+const dotenv = require("dotenv");
+const cors = require("cors")
+const paperRoutes = require("./routes/paperRoutes")
 
 dotenv.config()
 

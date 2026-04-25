@@ -1,7 +1,6 @@
-import { Request, Response } from "express";
-import { Paper } from "../models/Paper";
+const Paper = require("../models/Paper")
 
-export const createPaper = async(req: Request, res: Response) => {
+ const createPaper = async(req, res) => {
     try {
         const paper  = new Paper(req.body);
         await paper.save();
@@ -12,7 +11,7 @@ export const createPaper = async(req: Request, res: Response) => {
     }
 }
 
-export const getPapers = async(req: Request, res: Response) => {
+const getPapers = async(req, res) => {
     try {
         const papers = await Paper.find()
         res.json(papers);
@@ -20,3 +19,7 @@ export const getPapers = async(req: Request, res: Response) => {
         res.status(500).json({message: "Paper doesn't found"})
     }
 }
+
+
+module.exports = createPaper;
+module.exports = getPapers;
