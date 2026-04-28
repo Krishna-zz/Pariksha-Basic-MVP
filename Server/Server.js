@@ -3,6 +3,8 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const cors = require("cors")
 const paperRoutes = require("./routes/paperRoutes")
+const mongoose = require("mongoose");
+const { log } = require("console");
 
 dotenv.config()
 
@@ -14,7 +16,13 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 
-app.use("/api/papers", paperRoutes)
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log("Mongodb Connected"))
+.catch(err => console.log(err)
+)
+
+
+app.use("/api/papers", paperRoutes) 
 
 
 app.get('/home', (req, res) => {
@@ -22,4 +30,4 @@ app.get('/home', (req, res) => {
 })
 
 
-app.listen(5000, () => {console.log("the server is running")});
+app.listen(5000, () => {console.log("the server is running on port 5000")});
