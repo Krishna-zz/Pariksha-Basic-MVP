@@ -1,6 +1,6 @@
 const express = require("express");
-const createPaper = require("../controllers/paperController")
-const getPapers = require("../controllers/paperController")
+const  { createPaper, getPapers } = require("../controllers/paperController")
+
 
 const router = express.Router();
 
