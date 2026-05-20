@@ -69,7 +69,39 @@ const startExam = async(req, res) => {
         exam.startedAt = new Date();
         await exam.save();
 
+        res.status(200).json({ message: "Exam is now live", exam });
+
     } catch (err) {
         return res.status(500).json({message:"Server error", error: err.message})
+    }
+}
+
+
+// PATCH /api/exams/:id/end
+// End the exam → status becomes "ended"
+
+const endExam = async(req, res) => {
+    try {
+        const exam = await Exam.findById(req.params.id)
+
+        if(!exam){
+            return res.status(404).json({message:"Exam not found"})
+        }
+
+        if (exam.status === "scheduled"){
+            return res.status(400).json({message:"Exam hasn't started yet"})
+        }
+
+        if (exam.status === "ended"){
+            return res.status(400).json({message: "Exam has already ended"})
+        }
+
+        exam.status = "ended";
+        exam.endedAt = new Date();
+        await exam.save();
+
+        res.status(200).json({message: "Exam has ended", exam})
+    } catch (error) {
+          res.status(500).json({ message: "Server error", error: err.message });
     }
 }
