@@ -105,3 +105,33 @@ const endExam = async(req, res) => {
           res.status(500).json({ message: "Server error", error: err.message });
     }
 }
+
+// PATCH /api/exams/:id
+// Update exam settings (only when scheduled)
+
+const updateExam = async(req, res) => {
+    try {
+        const exam = await Exam.findById(req.params.id)
+
+        if (!exam) {
+          return res.status(404).json({ message: "Exam not found" });
+        }
+
+        if (exam.status !== "scheduled"){
+            return res.status(400).json({message: "Cannot edit an exam that is live or ended"})
+        }
+
+        const { title, scheduledAt, durationMinutes, antiCheat } = req.body;
+
+           if (title)           exam.title           = title;
+           if (scheduledAt)     exam.scheduledAt     = scheduledAt;
+           if (durationMinutes) exam.durationMinutes = durationMinutes;
+           if (antiCheat)       exam.antiCheat       = { ...exam.antiCheat, ...antiCheat };
+
+           await exam.save();
+
+           res.status(200).json({message:"Exam updated", exam})
+    } catch (err) {
+        res.status(500).json({message:"Server error", error: err.message})
+    }
+}
