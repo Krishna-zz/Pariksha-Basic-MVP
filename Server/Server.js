@@ -5,6 +5,7 @@ const cors = require("cors")
 const paperRoutes = require("./routes/paperRoutes")
 const mongoose = require("mongoose");
 const { log } = require("console");
+const examRoutes = require("./routes/examRoutes")
 
 dotenv.config()
 
@@ -23,6 +24,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 app.use("/api/papers", paperRoutes) 
+
+app.use("/api/exams", examRoutes)
 
 
 
