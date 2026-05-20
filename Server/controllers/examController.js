@@ -135,3 +135,26 @@ const updateExam = async(req, res) => {
         res.status(500).json({message:"Server error", error: err.message})
     }
 }
+
+// DELETE /api/exams/:id
+// Delete exam (only when scheduled)
+
+
+const deleteExam = async (req, res) => {
+  try {
+    const exam = await Exam.findById(req.params.id);
+
+    if (!exam) {
+      return res.status(404).json({ message: "Exam not found" });
+    }
+    if (exam.status !== "scheduled") {
+      return res.status(400).json({ message: "Cannot delete a live or ended exam" });
+    }
+
+    await exam.deleteOne();
+
+    res.status(200).json({ message: "Exam deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
