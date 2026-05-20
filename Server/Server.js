@@ -25,9 +25,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use("/api/papers", paperRoutes) 
 
 
-app.get('/home', (req, res) => {
-    res.send("Api is running!")
-})
+
 
 
 app.listen(5000, () => {console.log("the server is running on port 5000")});
