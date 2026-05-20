@@ -39,9 +39,14 @@ const ExamMonitor = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    void (async () => {
+      await fetchData();
+    })();
+
     // Auto-refresh every 10 seconds to watch live progress
-    const interval = setInterval(fetchData, 10000);
+    const interval = setInterval(() => {
+      void fetchData();
+    }, 10000);
     return () => clearInterval(interval);
   }, [examId]);
 

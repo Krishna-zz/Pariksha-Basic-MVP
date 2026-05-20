@@ -7,7 +7,7 @@ type Exam = {
   status: "scheduled" | "live" | "ended";
   durationMinutes: number;
   scheduledAt: string;
-  paperId: { title: string; questions: any[] };
+  paperId: { title: string; questions: unknown[] };
 };
 
 const ExamDashboard = () => {
@@ -20,7 +20,7 @@ const ExamDashboard = () => {
       const res = await fetch("http://localhost:5000/api/exams");
       const data = await res.json();
       setExams(data);
-    } catch (err) {
+    } catch {
       alert("Failed to fetch exams");
     } finally {
       setLoading(false);
@@ -28,7 +28,9 @@ const ExamDashboard = () => {
   };
 
   useEffect(() => {
-    fetchExams();
+    void (async () => {
+      await fetchExams();
+    })();
   }, []);
 
   const handleStatusChange = async (id: string, action: "start" | "end") => {
@@ -37,8 +39,8 @@ const ExamDashboard = () => {
       const res = await fetch(`http://localhost:5000/api/exams/${id}/${action}`, { method: "PATCH" });
       if (!res.ok) throw new Error(`Failed to ${action} exam`);
       fetchExams(); // Refresh list to get new statuses
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to delete exam");
     }
   };
 
@@ -48,8 +50,8 @@ const ExamDashboard = () => {
       const res = await fetch(`http://localhost:5000/api/exams/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete");
       setExams((prev) => prev.filter((e) => e._id !== id));
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to delete exam");
     }
   };
 
