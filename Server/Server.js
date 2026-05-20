@@ -6,6 +6,7 @@ const paperRoutes = require("./routes/paperRoutes")
 const mongoose = require("mongoose");
 const { log } = require("console");
 const examRoutes = require("./routes/examRoutes")
+const attemptRoutes = require("./routes/attemptRoutes")
 
 dotenv.config()
 
@@ -24,8 +25,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 app.use("/api/papers", paperRoutes) 
-
 app.use("/api/exams", examRoutes)
+app.use("/api/attempts", attemptRoutes);
 
 
 
