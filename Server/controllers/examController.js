@@ -17,8 +17,35 @@ const createExam = async(req, res) => {
       return res.status(400).json({ message: "title, scheduledAt, and durationMinutes are required" });
     }    
 
-    
-    } catch (error) {
-        
+    const exam = await Exam.create({
+        paperId,
+      title,
+      scheduledAt,
+      durationMinutes,
+      antiCheat: antiCheat || {},
+    })
+
+     res.status(201).json({ message: "Exam created successfully", exam });
+    } catch (err) {
+        res.status(500).json({ message: "Server error", error: err.message });
     }
 }
+
+
+const getExamById = async(req, res) => {
+    try {
+        const exam = await Exam.findById(req.params.id).populate("paperId", "title questions");
+
+        if(!exam){
+            return res.status(404).json({message: "Exam not found"})
+        }
+
+        res.status(200).json(exam)
+    } catch (err) {
+        res.status(500).json({message: "Server error", error: err.message})
+    }
+}
+
+// PATCH /api/exams/:id/start
+// Start the exam → status becomes "live"
+
