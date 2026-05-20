@@ -31,6 +31,21 @@ const createExam = async(req, res) => {
     }
 }
 
+// GET /api/exams
+// List all exams (with paper title populated)
+// ─────────────────────────────────────────
+const getAllExams = async (req, res) => {
+  try {
+    const exams = await Exam.find()
+      .populate("paperId", "title questions") // pulls paper title + question count
+      .sort({ scheduledAt: -1 });
+
+    res.status(200).json(exams);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 
 const getExamById = async(req, res) => {
     try {
@@ -157,4 +172,14 @@ const deleteExam = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
+};
+
+module.exports = {
+  createExam,
+  getAllExams,
+  getExamById,
+  startExam,
+  endExam,
+  updateExam,
+  deleteExam,
 };
