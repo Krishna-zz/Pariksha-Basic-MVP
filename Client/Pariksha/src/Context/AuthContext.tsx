@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const res = await api.get("/auth/me");
         setUser(res.data.user);
-      } catch (err) {
+      } catch {
         localStorage.removeItem("accessToken");
         setUser(null);
       } finally {
@@ -49,8 +49,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await api.post("/auth/logout"); // Clears the backend cookie
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error("Logout failed");
     } finally {
       localStorage.removeItem("accessToken");
       setUser(null);
@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+    // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
