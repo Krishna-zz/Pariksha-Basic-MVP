@@ -1,38 +1,59 @@
+//QPB
 import CreatePaper from "./pages/CreatePaper"
 import AllPapers from "./pages/AllPapers"
+
+//SEE
 import ExamAttempt from "./pages/AttemptExam/Examattempt";
 import ExamEntry from "./pages/AttemptExam/Examentry";
 import ExamResult from "./pages/AttemptExam/Examresult";
+
+//ECP
 import CreateExam from "./pages/ECP/CreateExam";
 import ExamDashboard from "./pages/ECP/ExamDashboard";
 import ExamMonitor from "./pages/ECP/ExamMonitor";
+import { AuthProvider } from "./Context/AuthContext";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
-import { Routes, Route, Link } from "react-router-dom";
+//pages
+import Homepage from "./pages/Homepage";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+
+import {BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 function App() {
   
 
   return (
-    <>
-     <Routes>
-
+  <>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* ── PUBLIC ROUTES ── */}
+          <Route path="/" element={<Homepage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         
-         {/* QPB */}
-        <Route path="/create" element={<CreatePaper/>} />
-        <Route path="/viewpapers" element={<AllPapers/>} />
+           {/* QPB */}
+           {/* ── TEACHER ROUTES (Protected) ── */}
+          <Route path="/create" element={<CreatePaper/>} />   
+          <Route path="/viewpapers" element={<AllPapers/>} />
 
-        {/* ECP */}
-        <Route path="/ecp/dashboard" element={<ExamDashboard />} />
-        <Route path="/ecp/create" element={<CreateExam />} />
-        <Route path="/ecp/monitor/:examId" element={<ExamMonitor />} />
+           {/* ECP */}
+           {/* ── TEACHER ROUTES (Protected) ── */}
+           <Route path="/ecp/dashboard" element={<ExamDashboard />} />
+           <Route path="/ecp/create" element={<CreateExam />} />
+           <Route path="/ecp/monitor/:examId" element={<ExamMonitor />} />
 
-        {/* SEE */}
-        <Route path="/exam/:examId"         element={<ExamEntry />} />
-        <Route path="/exam/:examId/attempt" element={<ExamAttempt />} />
-        <Route path="/exam/:examId/result"  element={<ExamResult />} />
-      </Routes>
-     
-    </>
+           {/* SEE */}
+           {/* ── STUDENT ROUTES (Protected) ── */}
+           <Route path="/exam/:examId"         element={<ExamEntry />} />
+           <Route path="/exam/:examId/attempt" element={<ExamAttempt />} />
+           <Route path="/exam/:examId/result"  element={<ExamResult />} />
+        </Routes>
+      </AuthProvider>
+     </BrowserRouter>
+  </>
   )
 }
 
