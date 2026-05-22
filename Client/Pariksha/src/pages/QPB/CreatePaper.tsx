@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import api from "../../api/axios";
 
 
 type Question = {
@@ -52,28 +53,16 @@ const CreatePaper = () => {
     setQuestions((prev) => prev.filter((_, i) => i !== index));
   };
  
-  const handleSubmit = async () => {
-    if (!title.trim()) {
-      alert("Please enter a paper title.");
-      return;
-    }
+ const handleSubmit = async () => {
+    if (!title.trim()) { alert("Please enter a paper title."); return; }
     setSubmitting(true);
     try {
-      // await API.post("/papers", { title, questions });
-
-      const res = await fetch("http://localhost:5000/api/papers",{
-        method: "POST",
-        headers: {
-          "Content-Type" : "application/json"
-        },
-        body: JSON.stringify({
-          title,
-          questions
-        })
-      })
-      alert("Paper has been created")
-
-      console.log(res)
+      // OLD: const res = await fetch("http://localhost:5000/api/papers", ...
+      
+      // NEW:
+      await api.post("/papers", { title, questions });
+      
+      alert("Paper has been created");
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 3000);
     } catch (err) {

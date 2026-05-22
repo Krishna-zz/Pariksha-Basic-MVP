@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import api from "../../api/axios";
 
 type Question = {
   questionText: string;
@@ -24,10 +25,9 @@ const AllPapers = () => {
   useEffect(() => {
     const fetchPapers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/papers");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        setPapers(data);
+        // NEW: Axios automatically parses the JSON, so we just use res.data
+        const res = await api.get("/papers");
+        setPapers(res.data);
       } catch {
         setError("Could not load papers. Is your server running?");
       } finally {

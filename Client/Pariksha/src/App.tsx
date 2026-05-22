@@ -1,6 +1,6 @@
 //QPB
-import CreatePaper from "./pages/CreatePaper"
-import AllPapers from "./pages/AllPapers"
+import CreatePaper from "./pages/QPB/CreatePaper"
+import AllPapers from "./pages/QPB/AllPapers"
 
 //SEE
 import ExamAttempt from "./pages/AttemptExam/Examattempt";
@@ -19,7 +19,7 @@ import Homepage from "./pages/Homepage";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 
-import {BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import {BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   
