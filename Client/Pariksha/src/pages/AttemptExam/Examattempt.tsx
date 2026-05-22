@@ -37,6 +37,34 @@ const ExamAttempt = () => {
   const [isFullScreen, setIsFullScreen] = useState(!requireFullscreen);
   const [violations, setViolations] = useState(0);
   const [violationMsg, setViolationMsg] = useState("");
+  const autoSubmitTriggered = violations >= MAX_VIOLATIONS;
+  const activeViolationMsg = autoSubmitTriggered
+    ? "Maximum violations reached. Your exam is being automatically submitted."
+    : violationMsg;
+
+  const handleSubmit = useCallback(async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    setShowConfirm(false);
+    clearInterval(timerRef.current!);
+    
+    // Exit fullscreen cleanly on submit
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+
+    try {
+      const res = await api.post(`/attempts/${attemptId}/submit`);
+      sessionStorage.setItem("result", JSON.stringify(res.data));
+      navigate(`/exam/${examId}/result`);
+    } catch (err: unknown) {
+      const errorMessage =
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Submission failed. Please try again.";
+      alert(errorMessage);
+      setSubmitting(false);
+    }
+  }, [attemptId, examId, navigate, submitting, setShowConfirm]);
 
   // ─────────────────────────────────────────
   // ANTI-CHEAT LOGIC
@@ -44,11 +72,10 @@ const ExamAttempt = () => {
   
   // Handle 3-Strikes Auto-Submit
   useEffect(() => {
-    if (violations >= MAX_VIOLATIONS) {
-      setViolationMsg("Maximum violations reached. Your exam is being automatically submitted.");
-      setTimeout(() => handleSubmit(true), 3000);
+    if (autoSubmitTriggered) {
+      setTimeout(() => handleSubmit(), 3000);
     }
-  }, [violations]);
+  }, [autoSubmitTriggered, handleSubmit]);
 
   useEffect(() => {
     if (!attemptId || questions.length === 0) {
@@ -101,7 +128,7 @@ const ExamAttempt = () => {
         await document.documentElement.requestFullscreen();
       }
       setIsFullScreen(true);
-    } catch (err) {
+    } catch {
       alert("Browser blocked fullscreen. Please try again.");
     }
   };
@@ -118,7 +145,7 @@ const ExamAttempt = () => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current!);
-          handleSubmit(true);
+          handleSubmit();
           return 0;
         }
         return prev - 1;
@@ -144,33 +171,12 @@ const ExamAttempt = () => {
     [attemptId]
   );
 
-  const handleSubmit = async (auto = false) => {
-    if (submitting) return;
-    setSubmitting(true);
-    setShowConfirm(false);
-    clearInterval(timerRef.current!);
-    
-    // Exit fullscreen cleanly on submit
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
-    }
-
-    try {
-      const res = await api.post(`/attempts/${attemptId}/submit`);
-      sessionStorage.setItem("result", JSON.stringify(res.data));
-      navigate(`/exam/${examId}/result`);
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Submission failed. Please try again.");
-      setSubmitting(false);
-    }
-  };
-
   // ─────────────────────────────────────────
   // RENDER BLOCKS
   // ─────────────────────────────────────────
 
   // BLOCK 1: Fullscreen Required Gate
-  if (requireFullscreen && !isFullScreen && !violationMsg && violations < MAX_VIOLATIONS) {
+  if (requireFullscreen && !isFullScreen && !activeViolationMsg && violations < MAX_VIOLATIONS) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4">
         <div className="text-center max-w-md">
@@ -193,7 +199,7 @@ const ExamAttempt = () => {
   }
 
   // BLOCK 2: Violation Warning Modal
-  if (violationMsg && violations < MAX_VIOLATIONS) {
+  if (activeViolationMsg && violations < MAX_VIOLATIONS) {
     return (
       <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center px-4 z-50">
         <div className="bg-slate-900 border border-red-500/30 rounded-2xl p-8 max-w-md text-center shadow-2xl shadow-red-500/10">
@@ -201,7 +207,7 @@ const ExamAttempt = () => {
             !
           </div>
           <h2 className="text-xl font-bold text-slate-100 mb-2">Rule Violation Detected</h2>
-          <p className="text-red-400 font-medium text-sm mb-4">{violationMsg}</p>
+          <p className="text-red-400 font-medium text-sm mb-4">{activeViolationMsg}</p>
           <div className="bg-slate-950 rounded-lg py-3 px-4 mb-8 border border-slate-800">
             <span className="text-slate-400 text-xs uppercase tracking-widest font-bold">Strike</span>
             <div className="text-2xl font-black text-slate-100">{violations} / {MAX_VIOLATIONS}</div>
@@ -245,11 +251,11 @@ const ExamAttempt = () => {
     <div className="min-h-screen bg-slate-950 flex flex-col font-sans select-none">
       
       {/* If 3 strikes hit, show this blocking overlay while auto-submitting */}
-      {violations >= MAX_VIOLATIONS && (
+      {autoSubmitTriggered && (
         <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center">
           <div className="w-16 h-16 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-6"></div>
           <h2 className="text-2xl font-black text-red-500 mb-2">Exam Terminated</h2>
-          <p className="text-slate-400">{violationMsg}</p>
+          <p className="text-slate-400">{activeViolationMsg}</p>
         </div>
       )}
 
@@ -441,7 +447,7 @@ const ExamAttempt = () => {
                 Go Back
               </button>
               <button
-                onClick={() => handleSubmit(false)}
+                onClick={() => handleSubmit()}
                 className="flex-1 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-bold rounded-xl transition shadow-lg shadow-indigo-600/20"
               >
                 Yes, Submit
