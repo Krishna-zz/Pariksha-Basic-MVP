@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/axios"; // ✅ Added our secure api client
 
 type Question = {
   [key: string]: unknown;
@@ -31,9 +32,9 @@ const CreateExam = () => {
   useEffect(() => {
     const fetchPapers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/papers");
-        const data = await res.json();
-        setPapers(data);
+        // ✅ CHANGED: Using api.get
+        const res = await api.get("/papers");
+        setPapers(res.data);
       } catch {
         alert("Failed to load question papers");
       } finally {
@@ -47,17 +48,13 @@ const CreateExam = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const res = await fetch("http://localhost:5000/api/exams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      // ✅ CHANGED: Using api.post (No need for JSON.stringify or headers!)
+      await api.post("/exams", formData);
 
-      if (!res.ok) throw new Error("Failed to create exam");
-      
       alert("Exam Scheduled Successfully!");
       navigate("/ecp/dashboard");
-    } catch (err: unknown) {
+    } catch (err) {
+      // ✅ CHANGED: Better error handling for Axios
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
       alert(errorMessage);
     } finally {

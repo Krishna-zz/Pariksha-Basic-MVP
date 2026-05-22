@@ -55,7 +55,10 @@ const protect = async (req, res, next) => {
     }
 
     // 3. Check user still exists and is active
-    const user = await User.findById(decoded.id).select("+passwordChangedAt isActive");
+    // FIX: Added a '+' in front of isActive, or just removed select entirely if not needed.
+    // To be perfectly safe, let's just explicitly ask for the fields we need:
+    const user = await User.findById(decoded.id).select("+passwordChangedAt role name isActive");
+    
     if (!user) {
       return res.status(401).json({ message: "User no longer exists." });
     }

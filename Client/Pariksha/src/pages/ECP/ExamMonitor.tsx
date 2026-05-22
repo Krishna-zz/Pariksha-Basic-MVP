@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../../api/axios"; // ✅ Added our secure api client
 
 type AttemptSummary = {
   total: number;
@@ -26,11 +27,10 @@ const ExamMonitor = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/attempts?examId=${examId}`);
-      if (!res.ok) throw new Error("Failed to fetch attempts");
-      const data = await res.json();
-      setSummary(data.summary);
-      setAttempts(data.attempts);
+      // ✅ CHANGED: Using api.get instead of fetch
+      const res = await api.get(`/attempts?examId=${examId}`);
+      setSummary(res.data.summary);
+      setAttempts(res.data.attempts);
     } catch (error) {
       console.error(error);
     } finally {

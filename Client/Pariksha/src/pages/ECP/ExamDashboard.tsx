@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/axios"; // Our magic Axios client
+import { isAxiosError } from "axios";
 
 type Exam = {
   _id: string;
@@ -17,10 +19,17 @@ const ExamDashboard = () => {
 
   const fetchExams = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/exams");
-      const data = await res.json();
-      setExams(data);
-    } catch {
+      // ✅ CHANGED: Using api.get instead of fetch
+      const res = await api.get("/exams");
+      setExams(res.data); // Axios automatically parses the JSON into res.data
+    } catch (err: unknown) {
+      if (isAxiosError(err) && err.response?.data?.message) {
+        console.error(err.response.data);
+      } else if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error(err);
+      }
       alert("Failed to fetch exams");
     } finally {
       setLoading(false);
@@ -36,22 +45,34 @@ const ExamDashboard = () => {
   const handleStatusChange = async (id: string, action: "start" | "end") => {
     if (!window.confirm(`Are you sure you want to ${action} this exam?`)) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/exams/${id}/${action}`, { method: "PATCH" });
-      if (!res.ok) throw new Error(`Failed to ${action} exam`);
+      // ✅ CHANGED: Using api.patch
+      await api.patch(`/exams/${id}/${action}`);
       fetchExams(); // Refresh list to get new statuses
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to delete exam");
+      if (isAxiosError(err) && err.response?.data?.message) {
+        alert(err.response.data.message);
+      } else if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert(`Failed to ${action} exam`);
+      }
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("Permanently delete this scheduled exam?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/exams/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
+      // ✅ CHANGED: Using api.delete
+      await api.delete(`/exams/${id}`);
       setExams((prev) => prev.filter((e) => e._id !== id));
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Failed to delete exam");
+      if (isAxiosError(err) && err.response?.data?.message) {
+        alert(err.response.data.message);
+      } else if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert("Failed to delete exam");
+      }
     }
   };
 
