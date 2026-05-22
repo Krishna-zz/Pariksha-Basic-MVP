@@ -40,8 +40,8 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <span className="text-white font-black text-2xl leading-none">A</span>
+        <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-600/20">
+          <span className="text-white font-black text-2xl leading-none">P</span>
         </div>
         <h2 className="text-3xl font-black text-slate-900 tracking-tight">Welcome back</h2>
         <p className="mt-2 text-sm text-slate-500">
@@ -93,7 +93,7 @@ const Login = () => {
               disabled={loading}
               className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all active:scale-95 disabled:opacity-60"
             >
-              {loading ? "Signing in..." : "Sign in to AssessOS"}
+              {loading ? "Signing in..." : "Sign in to Pariksha"}
             </button>
           </form>
         </div>

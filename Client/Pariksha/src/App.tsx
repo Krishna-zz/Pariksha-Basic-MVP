@@ -19,14 +19,14 @@ import Homepage from "./pages/Homepage";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 
-import {BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 function App() {
   
 
   return (
   <>
-    <BrowserRouter>
+    
       <AuthProvider>
         <Routes>
           {/* ── PUBLIC ROUTES ── */}
@@ -35,6 +35,7 @@ function App() {
           <Route path="/register" element={<Register />} />
         
            {/* QPB */}
+           
            {/* ── TEACHER ROUTES (Protected) ── */}
            <Route element={<ProtectedRoute allowedRoles={["teacher"]} />}>
           <Route path="/create" element={<CreatePaper/>} />   
@@ -57,7 +58,7 @@ function App() {
           </Route>
         </Routes>
       </AuthProvider>
-     </BrowserRouter>
+     
   </>
   )
 }

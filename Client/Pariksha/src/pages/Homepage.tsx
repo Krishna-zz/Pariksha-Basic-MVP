@@ -18,12 +18,12 @@ const Homepage = () => {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-100">
       {/* ── SMART NAVIGATION BAR ── */}
       <nav className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-3">
+       <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-            <span className="text-white font-black text-xl leading-none">A</span>
+            <span className="text-white font-black text-xl leading-none">P</span>
           </div>
           <span className="text-2xl font-black tracking-tight text-slate-900">
-            Assess<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">OS</span>
+            Pariksha
           </span>
         </div>
         
