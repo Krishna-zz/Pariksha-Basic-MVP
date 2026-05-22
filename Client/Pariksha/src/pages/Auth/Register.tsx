@@ -29,8 +29,16 @@ const Register = () => {
       } else {
         navigate("/");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create account.");
+    } catch (err: unknown) {
+      const message =
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err &&
+        typeof (err as { response?: { data?: { message?: string } } }).response?.data?.message === "string"
+          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          : "Failed to create account.";
+
+      setError(message || "Failed to create account.");
     } finally {
       setLoading(false);
     }
@@ -55,10 +63,14 @@ const Register = () => {
             )}
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
+              <label htmlFor="name" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
               <input
+                id="name"
+                name="name"
                 type="text"
                 required
+                placeholder="Your full name"
+                title="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full text-sm text-slate-800 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
@@ -66,10 +78,14 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
+              <label htmlFor="email" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
               <input
+                id="email"
+                name="email"
                 type="email"
                 required
+                placeholder="you@example.com"
+                title="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full text-sm text-slate-800 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
@@ -77,11 +93,15 @@ const Register = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Password</label>
+              <label htmlFor="password" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Password</label>
               <input
+                id="password"
+                name="password"
                 type="password"
                 required
                 minLength={8}
+                placeholder="At least 8 characters"
+                title="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full text-sm text-slate-800 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
