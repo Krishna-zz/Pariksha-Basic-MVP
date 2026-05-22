@@ -16,8 +16,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Replace with your exact frontend URL
-    credentials: true,               // Allows cookies to be sent back and forth
+    origin: "http://localhost:5173", // Make sure this matches your frontend URL exactly
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"] // THIS IS THE MAGIC FIX
   })
 );
 app.use(morgan('dev'));

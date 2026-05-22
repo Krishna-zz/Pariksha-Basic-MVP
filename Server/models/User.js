@@ -55,22 +55,18 @@ const userSchema = new mongoose.Schema(
 // ─────────────────────────────────────────
 // Hash password before saving
 // ─────────────────────────────────────────
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   // Only hash if password was modified
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
 
-  try {
-    const salt    = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
+  // We don't need try/catch or next(). 
+  // Because this is an async function, if it fails, Mongoose catches the error automatically!
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
 
-    // Track when password was last changed (for token invalidation)
-    if (!this.isNew) {
-      this.passwordChangedAt = new Date();
-    }
-
-    next();
-  } catch (err) {
-    next(err);
+  // Track when password was last changed (for token invalidation)
+  if (!this.isNew) {
+    this.passwordChangedAt = new Date();
   }
 });
 

@@ -1,8 +1,8 @@
-import axios from "axios";
+import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
-  withCredentials: true, // Crucial: Allows sending/receiving the httpOnly refresh cookie
+  baseURL: 'http://localhost:5000/api', // Adjust if your backend uses a different URL
+  withCredentials: true, 
 });
 
 // Request Interceptor: Attach access token
@@ -23,12 +23,21 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // If error is 401 and we haven't retried yet
+    // 🚨 THE MAGIC FIX: Bypass the interceptor for Auth routes!
+    // If the 401 came from login, register, or refresh, DO NOT try to auto-refresh.
+    if (
+      originalRequest.url?.includes('/auth/login') ||
+      originalRequest.url?.includes('/auth/register') ||
+      originalRequest.url?.includes('/auth/refresh')
+    ) {
+      return Promise.reject(error);
+    }
+
+    // If it's a 401 from a protected route (like viewing papers) and we haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Ask backend for a new token using the httpOnly cookie
         const res = await axios.post(
           'http://localhost:5000/api/auth/refresh',
           {},
@@ -38,13 +47,15 @@ api.interceptors.response.use(
         const newAccessToken = res.data.accessToken;
         localStorage.setItem('accessToken', newAccessToken);
 
-        // Update the failed request with the new token and retry it
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // If refresh fails (cookie expired/invalid), force logout
         localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+        
+        // Only redirect if we aren't ALREADY on the login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
         return Promise.reject(refreshError);
       }
     }
