@@ -69,7 +69,7 @@ const AllPapers = () => {
               {papers.length} paper{papers.length !== 1 ? "s" : ""} saved
             </p>
           </div>
-          {/* ✅ Fixed: was missing the opening < for the <a> tag */}
+        
           
            <a href="/create"
             className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
