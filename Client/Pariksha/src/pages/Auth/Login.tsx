@@ -29,8 +29,9 @@ const Login = () => {
       } else {
         navigate("/");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to login. Check your credentials.");
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || "Failed to login. Check your credentials.");
     } finally {
       setLoading(false);
     }
@@ -58,8 +59,12 @@ const Login = () => {
             )}
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
+              <label htmlFor="email" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Email Address</label>
               <input
+                id="email"
+                name="email"
+                title="Email Address"
+                placeholder="you@example.com"
                 type="email"
                 required
                 value={email}
@@ -69,8 +74,12 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Password</label>
+              <label htmlFor="password" className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Password</label>
               <input
+                id="password"
+                name="password"
+                title="Password"
+                placeholder="Enter your password"
                 type="password"
                 required
                 value={password}
