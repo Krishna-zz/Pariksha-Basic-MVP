@@ -36,20 +36,25 @@ function App() {
         
            {/* QPB */}
            {/* ── TEACHER ROUTES (Protected) ── */}
+           <Route element={<ProtectedRoute allowedRoles={["teacher"]} />}>
           <Route path="/create" element={<CreatePaper/>} />   
           <Route path="/viewpapers" element={<AllPapers/>} />
 
            {/* ECP */}
            {/* ── TEACHER ROUTES (Protected) ── */}
+           
            <Route path="/ecp/dashboard" element={<ExamDashboard />} />
            <Route path="/ecp/create" element={<CreateExam />} />
            <Route path="/ecp/monitor/:examId" element={<ExamMonitor />} />
+           </Route>
 
            {/* SEE */}
            {/* ── STUDENT ROUTES (Protected) ── */}
+          <Route element={<ProtectedRoute allowedRoles={["student", "teacher"]} />}>
            <Route path="/exam/:examId"         element={<ExamEntry />} />
            <Route path="/exam/:examId/attempt" element={<ExamAttempt />} />
            <Route path="/exam/:examId/result"  element={<ExamResult />} />
+          </Route>
         </Routes>
       </AuthProvider>
      </BrowserRouter>
