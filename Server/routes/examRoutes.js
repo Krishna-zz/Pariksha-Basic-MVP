@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { protect, teacherOnly } = require("../Middleware/auth");
 
 const {
   createExam,
@@ -10,6 +11,9 @@ const {
   updateExam,
   deleteExam,
 } = require("../controllers/examController")
+
+
+router.use(protect, teacherOnly);    //now protected routes are applied to all routes below
 
 
 router.post ("/", createExam)
