@@ -47,19 +47,29 @@ const getAllExams = async (req, res) => {
 };
 
 
-const getExamById = async(req, res) => {
-    try {
-        const exam = await Exam.findById(req.params.id).populate("paperId", "title questions");
+const getExamById = async (req, res) => {
+  try {
+    // Note: Assuming you populate paperId like this:
+    const exam = await Exam.findById(req.params.id).populate("paperId");
+    
+    if (!exam) return res.status(404).json({ message: "Exam not found" });
 
-        if(!exam){
-            return res.status(404).json({message: "Exam not found"})
-        }
+    // 🚨 ANTI-CHEAT: Convert Mongoose document to a plain JavaScript object
+    const examData = exam.toObject();
 
-        res.status(200).json(exam)
-    } catch (err) {
-        res.status(500).json({message: "Server error", error: err.message})
+    // 🚨 ANTI-CHEAT: Delete the correct answers before sending to the browser!
+    if (examData.paperId && examData.paperId.questions) {
+      examData.paperId.questions = examData.paperId.questions.map((q) => {
+        delete q.correctAnswer; // Strip the answer!
+        return q;
+      });
     }
-}
+
+    res.status(200).json(examData); // Send the sanitized data
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // PATCH /api/exams/:id/start
 // Start the exam → status becomes "live"

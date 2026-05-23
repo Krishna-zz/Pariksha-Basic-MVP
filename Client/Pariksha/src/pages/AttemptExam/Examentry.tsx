@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../../api/axios"; // ✅ Added our secure api client
 
 type ExamInfo = {
   _id: string;
@@ -31,10 +32,9 @@ const ExamEntry = () => {
   useEffect(() => {
     const fetchExam = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/exams/${examId}`);
-        if (!res.ok) throw new Error("Not found");
-        const data = await res.json();
-        setExam(data);
+        // ✅ CHANGED: Using api.get
+        const res = await api.get(`/exams/${examId}`);
+        setExam(res.data);
       } catch {
         setFetchError("Could not load exam. Check the link or ask your teacher.");
       } finally {
@@ -49,13 +49,13 @@ const ExamEntry = () => {
     setError("");
     setStarting(true);
     try {
-      const res = await fetch("http://localhost:5000/api/attempts/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ examId, studentName: studentName.trim() }),
+      // ✅ CHANGED: Using api.post
+      const res = await api.post("/attempts/start", {
+        examId,
+        studentName: studentName.trim()
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to start");
+      
+      const data = res.data; // Axios puts the JSON response here
 
       sessionStorage.setItem("attemptId", data.attemptId);
       sessionStorage.setItem("studentName", studentName.trim());
@@ -64,8 +64,17 @@ const ExamEntry = () => {
       sessionStorage.setItem("antiCheat", JSON.stringify(data.antiCheat));
 
       navigate(`/exam/${examId}/attempt`);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to start exam.");
+    } catch (err) {
+      // ✅ CHANGED: Better error handling
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null &&
+              "response" in err &&
+              typeof (err as { response?: { data?: { message?: unknown } } }).response?.data?.message === "string"
+            ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+            : "Failed to start exam.";
+      setError(errorMessage ?? "Failed to start exam.");
     } finally {
       setStarting(false);
     }

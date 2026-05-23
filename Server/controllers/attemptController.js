@@ -81,7 +81,7 @@ const startAttempt = async(req, res) => {
       questions,           // safe — no correct answers
     });
 
-    } catch (error) {
+    } catch (err) {
          res.status(500).json({ message: "Server error", error: err.message });
     }
 }
@@ -127,7 +127,7 @@ const saveAnswer = async(req, res) => {
     await attempt.save();
 
      res.status(200).json({ message: "Answer saved", questionIndex, selectedOption });
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });
     }
 }

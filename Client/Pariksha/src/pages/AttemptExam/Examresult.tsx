@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../../api/axios"; // ✅ Added our secure api client
 
 type BreakdownItem = {
   questionIndex:  number;
@@ -34,10 +35,11 @@ const ExamResult = () => {
   useEffect(() => {
     const attemptId = sessionStorage.getItem("attemptId");
     if (attemptId) {
-      fetch(`http://localhost:5000/api/attempts/${attemptId}/result`)
-        .then((r) => r.json())
-        .then((data) => { setResult(data); setLoading(false); })
+      // ✅ CHANGED: Using api.get instead of fetch
+      api.get(`/attempts/${attemptId}/result`)
+        .then((res) => { setResult(res.data); setLoading(false); })
         .catch(() => {
+          // Fallback to local storage if API fails (good safeguard)
           const cached = sessionStorage.getItem("result");
           if (cached) {
             setResult({
@@ -49,7 +51,7 @@ const ExamResult = () => {
           setLoading(false);
         });
     } else {
-      setLoading(false);
+      queueMicrotask(() => setLoading(false));
     }
   }, []);
 
